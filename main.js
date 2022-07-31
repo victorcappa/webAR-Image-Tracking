@@ -1,6 +1,15 @@
-//import * as THREE from "../libs/three.js-r132/build/three.module.js";
 import { GLTFLoader } from "../libs/three.js-r132/examples/jsm/loaders/GLTFLoader.js";
+import { loadGLTF } from "../libs/loader.js";
 const THREE = window.MINDAR.IMAGE.THREE;
+
+// const loadGLTF = (path) => {
+// 	return new Promise((resolve, reject) => {
+// 		const loader = new GLTFLoader();
+// 		loader.load(path, (gltf) => {
+// 			resolve(gltf);
+// 		});
+// 	});
+// };
 
 document.addEventListener("DOMContentLoaded", () => {
 	const start = async () => {
@@ -10,23 +19,16 @@ document.addEventListener("DOMContentLoaded", () => {
 		});
 
 		const { renderer, scene, camera } = mindarThree;
-		//document.body.appendChild(renderer.domElement);
 
-		// const geometry = new THREE.BoxGeometry(1, 1, 1);
-		// const material = new THREE.MeshBasicMaterial({ wireframe: true, transparent: true, opacity: 1 });
-		// const plane = new THREE.Mesh(geometry, material);
-
-		// plane.scale.set(0.35, 0.35, 0.35);
-		// plane.position.set(0, 0, 0.3);
-
+		const light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
+		scene.add(light);
 		const anchor = mindarThree.addAnchor(0);
+		const gltf = await loadGLTF("./assets/models/musicband-bear/scene.gltf");
+		gltf.scene.scale.set(0.1, 0.1, 0.1);
+		gltf.scene.rotation.x = Math.PI / 2;
+		anchor.group.add(gltf.scene);
 
 		const loader = new GLTFLoader();
-		loader.load("../assets/models/musicband-bear/scene.gltf", (gltf) => {
-			anchor.group.add(gltf.scene);
-		});
-
-		//anchor.group.add(plane); // THREE.Group
 
 		await mindarThree.start();
 
@@ -36,5 +38,3 @@ document.addEventListener("DOMContentLoaded", () => {
 	};
 	start();
 });
-
-
