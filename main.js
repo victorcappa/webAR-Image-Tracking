@@ -30,7 +30,18 @@ document.addEventListener("DOMContentLoaded", () => {
 		// gltf animations
 		const mixer = new THREE.AnimationMixer(raccoon.scene);
 		const action = mixer.clipAction(raccoon.animations[0]);
-		action.play();
+		//action.play();
+
+		// handling events
+
+		raccoonAnchor.onTargetFound = () => {
+			action.play();
+			console.log("raccoon found");
+		};
+		raccoonAnchor.onTargetLost = () => {
+			action.stop();
+			console.log("raccoon lost");
+		};
 
 		const clock = new THREE.Clock();
 
