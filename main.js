@@ -1,36 +1,27 @@
-import * as THREE from "../libs/three.js-r132/build/three.module.js";
+//import * as THREE from "../libs/three.js-r132/build/three.module.js";
 
-// run js after the page is loaded
+const THREE = window.MINDAR.IMAGE.THREE;
+
 document.addEventListener("DOMContentLoaded", () => {
-	const scene = new THREE.Scene();
-	const geometry = new THREE.BoxGeometry(1, 1, 1);
-	const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-	const cube = new THREE.Mesh(geometry, material);
-	const renderer = new THREE.WebGLRenderer({ alpha: true });
-	const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+	const start = async () => {
+		const mindarThree = new window.MINDAR.IMAGE.MindARThree({
+			container: document.body,
+			imageTargetSrc: "./assets/sucrilhos.mind",
+		});
+		const { renderer, scene, camera } = mindarThree;
 
-	scene.add(cube);
-	cube.position.set(0, 0, -2);
-	cube.rotation.set(0, Math.PI / 4, 0);
-	camera.position.set(1, 1, 1);
+		const geometry = new THREE.PlaneGeometry(1, 1);
+		const material = new THREE.MeshBasicMaterial({ color: 0x0000ff, transparent: true, opacity: 0.5 });
+		const plane = new THREE.Mesh(geometry, material);
 
-	renderer.setSize(window.innerWidth, window.innerHeight);
-	renderer.render(scene, camera);
+		const anchor = mindarThree.addAnchor(0);
 
-	const video = document.createElement("video");
-	navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
-		video.srcObject = stream;
-		video.play();
-	});
+		anchor.group.add(plane); // THREE.Group
+		await mindarThree.start();
 
-	//Video Style
-	video.style.position = "absolute";
-	video.style.width = renderer.domElement.width;
-	video.style.height = renderer.domElement.height;
-	video.style.width = "70vw";
-	video.style.left = "15vw";
-
-	renderer.domElement.style.position = "absolute";
-	document.body.appendChild(video);
-	document.body.appendChild(renderer.domElement);
+		renderer.setAnimationLoop(() => {
+			renderer.render(scene, camera);
+		});
+	};
+	start();
 });
