@@ -49,7 +49,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		const action = mixer.clipAction(raccoon.animations[0]);
 		//action.play();
 
-		// handling events
+		// handling events on models
 
 		raccoonAnchor.onTargetFound = () => {
 			action.play();
