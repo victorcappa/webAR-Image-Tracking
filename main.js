@@ -37,6 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		raccoon.scene.scale.set(0.1, 0.1, 0.1);
 		const raccoonAnchor = mindarThree.addAnchor(1);
 		raccoonAnchor.group.add(raccoon.scene, audioSource);
+		raccoon.scene.userData.clickable = true;
 
 		const donut = await loadGLTF("./assets/models/d1.glb");
 		donut.scene.scale.set(10, 10, 10);
@@ -52,14 +53,43 @@ document.addEventListener("DOMContentLoaded", () => {
 
 		raccoonAnchor.onTargetFound = () => {
 			action.play();
-			audioSource.play();
+			//audioSource.play();
 			console.log("raccoon found");
 		};
 		raccoonAnchor.onTargetLost = () => {
 			action.stop();
-			audioSource.stop();
+			//audioSource.stop();
 			console.log("raccoon lost");
 		};
+
+		// user interaction
+
+		document.body.addEventListener("click", (e) => {
+			const mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+			const mouseY = -1 * (e.clientY / window.innerHeight) * 2 + 1;
+			const mouse = new THREE.Vector2(mouseX, mouseY);
+
+			const raycaster = new THREE.Raycaster();
+			raycaster.setFromCamera(mouse, camera);
+
+			const intersects = raycaster.intersectObjects(scene.children, true);
+
+			if (intersects.length > 0) {
+				let o = intersects[0].object;
+
+				while (o.parent && !o.userData.clickable) {
+					o = o.parent;
+				}
+				if (o.userData.clickable) {
+					if (o !== raccoon.scene) {
+						audioSource.play();
+					}
+
+					if (o === raccoon.scene) {
+					}
+				}
+			}
+		});
 
 		const clock = new THREE.Clock();
 
@@ -70,6 +100,7 @@ document.addEventListener("DOMContentLoaded", () => {
 			mixer.update(delta);
 			raccoon.scene.rotation.set(0, raccoon.scene.rotation.y + delta, 0);
 			renderer.render(scene, camera);
+			console.log(raccoon.scene.userData.clickable);
 		});
 	};
 
